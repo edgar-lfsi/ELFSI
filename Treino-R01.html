@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Treino Semanal</title>
+    <!-- Incluindo Tailwind CSS para estilização rápida e responsiva -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e2e8f0; /* Fundo mais suave */
+            color: #2d3748;
+        }
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: #ffffff;
+            border-radius: 1.25rem; /* Cantos mais arredondados */
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); /* Sombra mais pronunciada */
+        }
+        .collapsible-header {
+            cursor: pointer;
+            padding: 1rem;
+            border-bottom: 1px solid #cbd5e0; /* Borda mais clara */
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .collapsible-header:hover {
+            background-color: #e2e8f0; /* Hover mais suave */
+            transform: translateY(-2px); /* Efeito de leve levantamento */
+        }
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.7s ease-out; /* Transição mais lenta para um efeito suave */
+            padding: 0 1rem;
+        }
+        .collapsible-content.active {
+            max-height: 1200px; /* Aumentado para acomodar mais conteúdo se necessário */
+            padding: 1rem;
+        }
+        .exercise-item {
+            padding: 1rem 0;
+            border-bottom: 1px dashed #e2e8f0;
+            display: grid;
+            grid-template-columns: 1fr; /* Padrão para celular */
+            gap: 1rem;
+            align-items: center;
+        }
+        @media (min-width: 768px) { /* Para tablets e desktops */
+            .exercise-item {
+                grid-template-columns: 2fr 1fr; /* Duas colunas */
+            }
+        }
+        .exercise-item:last-child {
+            border-bottom: none;
+        }
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e2e8f0;
+            border-radius: 9999px;
+            height: 14px; /* Altura um pouco maior */
+            overflow: hidden;
+            margin-bottom: 1.5rem; /* Margem inferior aumentada */
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2); /* Sombra interna para profundidade */
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background-color: #38b2ac; /* Um tom de verde-água vibrante */
+            border-radius: 9999px;
+            transition: width 0.6s ease-in-out; /* Transição mais suave */
+        }
+        .btn {
+            padding: 0.6rem 1.25rem; /* Padding ligeiramente maior */
+            border-radius: 0.625rem; /* Mais arredondado */
+            font-weight: 700; /* Mais negrito */
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            display: block; /* Ocupa a largura total no mobile */
+        }
+        .btn-primary {
+            background-color: #4c51bf; /* Azul índigo mais profundo */
+            color: white;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #364089; /* Tom mais escuro no hover */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        .btn-secondary {
+            background-color: #a0aec0;
+            color: white;
+            border: none;
+        }
+        .btn-secondary:hover {
+            background-color: #718096;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        .btn-disabled {
+            background-color: #e2e8f0;
+            color: #a0aec0;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+        .reset-workout-btn {
+            background-color: #e53e3e; /* Vermelho para reset */
+            color: white;
+            margin-top: 1.5rem;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+        .reset-workout-btn:hover {
+            background-color: #c53030;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div class="container">
+        <h1 class="text-4xl font-extrabold text-center mb-8 text-indigo-800">Treino Semanal</h1>
+
+        <!-- Dados do treino -->
+        <script>
+            // Estrutura de dados para os treinos
+            const workouts = [
+                {
+                    day: "Costas + Bíceps + Abdome",
+                    exercises: [
+                        { name: "Puxada frontal na polia", group: "Costas", series: 4, reps: "10" },
+                        { name: "Remada curvada com barra", group: "Costas", series: 4, reps: "10" },
+                        { name: "Remada unilateral com halteres", group: "Costas", series: 3, reps: "10" },
+                        { name: "Rosca direta com barra W", group: "Bíceps", series: 3, reps: "10" },
+                        { name: "Rosca alternada com halteres", group: "Bíceps", series: 3, reps: "10" },
+                        { name: "Rosca martelo com halteres", group: "Bíceps", series: 3, reps: "10" },
+                        { name: "Abdominal Reto", group: "Abdome", series: 2, reps: "50" },
+                        { name: "Prancha isométrica", group: "Abdome", series: 3, reps: "40s" }
+                    ]
+                },
+                {
+                    day: "Pernas + Glúteos + Abdutores/Adutores + Abdome",
+                    exercises: [
+                        { name: "Agachamento livre", group: "Pernas (geral)", series: 4, reps: "10" },
+                        { name: "Leg press 45°", group: "Pernas/Glúteos", series: 4, reps: "12" },
+                        { name: "Cadeira extensora", group: "Quadríceps", series: 3, reps: "12" },
+                        { name: "Cadeira flexora", group: "Posterior de coxa", series: 3, reps: "12" },
+                        { name: "Hip thrust com barra", group: "Glúteos", series: 3, reps: "12" },
+                        { name: "Abdutora sentada", group: "Abdutores", series: 3, reps: "15" },
+                        { name: "Adutora sentada", group: "Adutores", series: 3, reps: "15" },
+                        { name: "Panturrilha Máquina", group: "Panturrilha", series: 3, reps: "20" },
+                        { name: "Abdominal Tesoura Cruzada", group: "Abdome", series: 2, reps: "50" },
+                        { name: "Prancha lateral", group: "Abdome/Oblíquos", series: 2, reps: "30s" }
+                    ]
+                },
+                {
+                    day: "Peito + Ombros + Tríceps + Abdome",
+                    exercises: [
+                        { name: "Supino reto com barra", group: "Peito", series: 4, reps: "10" },
+                        { name: "Supino inclinado com halteres", group: "Peito", series: 3, reps: "10" },
+                        { name: "Crucifixo com halteres", group: "Peito", series: 3, reps: "12" },
+                        { name: "Desenvolvimento com halteres", group: "Ombros", series: 4, reps: "10" },
+                        { name: "Elevação lateral com halteres", group: "Ombros", series: 3, reps: "12" },
+                        { name: "Tríceps na polia com barra reta", group: "Tríceps", series: 3, reps: "10" },
+                        { name: "Tríceps testa com barra EZ", group: "Tríceps", series: 3, reps: "10" },
+                        { name: "Abdominal Reto", group: "Abdome", series: 2, reps: "50" },
+                        { name: "Prancha isométrica", group: "Abdome", series: 3, reps: "40s" }
+                    ]
+                }
+            ];
+
+            // Variáveis globais para gerenciar o estado dos exercícios
+            const exerciseStates = {}; // Para armazenar o estado atual de cada exercício (séries concluídas)
+
+            // Função para atualizar a barra de progresso de um treino específico
+            function updateWorkoutProgressBar(workoutIndex) {
+                const workout = workouts[workoutIndex];
+                let completedSeriesCount = 0;
+                let totalSeriesCount = 0;
+
+                workout.exercises.forEach((exercise, exerciseIndex) => {
+                    const exerciseId = `exercise-${workoutIndex}-${exerciseIndex}`;
+                    const state = exerciseStates[exerciseId];
+                    if (state) {
+                        completedSeriesCount += state.currentSeries;
+                    }
+                    totalSeriesCount += exercise.series;
+                });
+
+                const progressBarFill = document.getElementById(`progress-bar-fill-${workoutIndex}`);
+                if (progressBarFill) {
+                    const progress = totalSeriesCount === 0 ? 0 : (completedSeriesCount / totalSeriesCount) * 100;
+                    progressBarFill.style.width = `${progress}%`;
+                }
+            }
+
+            // Função para adicionar 1 série
+            function addOneSeries(button, seriesDisplay, exerciseId, totalSeries, workoutIndex) {
+                if (!exerciseStates[exerciseId]) {
+                    exerciseStates[exerciseId] = {
+                        currentSeries: 0
+                    };
+                }
+
+                const state = exerciseStates[exerciseId];
+                
+                // Se já finalizado, não faz nada
+                if (state.currentSeries >= totalSeries) {
+                    return;
+                }
+
+                state.currentSeries++;
+                seriesDisplay.textContent = `Série: ${state.currentSeries}/${totalSeries} | Reps: ${seriesDisplay.dataset.reps}`;
+                updateWorkoutProgressBar(workoutIndex);
+
+                if (state.currentSeries >= totalSeries) {
+                    // Finalizou todas as séries
+                    button.textContent = "Finalizado";
+                    button.disabled = true;
+                    button.classList.add('btn-disabled');
+                    button.classList.remove('btn-primary');
+                }
+            }
+
+            // Função para voltar 1 série
+            function subtractOneSeries(button, seriesDisplay, exerciseId, totalSeries, workoutIndex) {
+                if (!exerciseStates[exerciseId]) {
+                    exerciseStates[exerciseId] = {
+                        currentSeries: 0
+                    };
+                }
+
+                const state = exerciseStates[exerciseId];
+
+                if (state.currentSeries > 0) {
+                    state.currentSeries--;
+                    seriesDisplay.textContent = `Série: ${state.currentSeries}/${totalSeries} | Reps: ${seriesDisplay.dataset.reps}`;
+                    updateWorkoutProgressBar(workoutIndex);
+
+                    // Reabilitar o botão se não estiver mais finalizado
+                    if (state.currentSeries < totalSeries) {
+                        // Assumimos que 'button' é o botão de adicionar série para reativar
+                        const addSeriesBtn = document.getElementById(`add-series-btn-${exerciseId}`);
+                        if (addSeriesBtn) {
+                            addSeriesBtn.textContent = "+ 1 Série";
+                            addSeriesBtn.disabled = false;
+                            addSeriesBtn.classList.remove('btn-disabled');
+                            addSeriesBtn.classList.add('btn-primary');
+                        }
+                    }
+                }
+            }
+
+            // Função para resetar um exercício
+            function resetExercise(addSeriesBtn, seriesDisplay, exerciseId, workoutIndex) {
+                exerciseStates[exerciseId] = {
+                    currentSeries: 0
+                };
+                addSeriesBtn.textContent = "+ 1 Série";
+                addSeriesBtn.disabled = false;
+                addSeriesBtn.classList.remove('btn-disabled');
+                addSeriesBtn.classList.add('btn-primary');
+                seriesDisplay.textContent = `Série: 0/${seriesDisplay.dataset.totalSeries} | Reps: ${seriesDisplay.dataset.reps}`;
+                updateWorkoutProgressBar(workoutIndex);
+            }
+
+            // Função para resetar um treino completo
+            function resetWorkout(workoutIndex) {
+                const workout = workouts[workoutIndex];
+                workout.exercises.forEach((exercise, exerciseIndex) => {
+                    const exerciseId = `exercise-${workoutIndex}-${exerciseIndex}`;
+                    const addSeriesBtn = document.getElementById(`add-series-btn-${exerciseId}`);
+                    const seriesDisplay = document.getElementById(`series-display-${exerciseId}`);
+                    resetExercise(addSeriesBtn, seriesDisplay, exerciseId, workoutIndex);
+                });
+            }
+
+            // Função para renderizar os treinos na página
+            document.addEventListener('DOMContentLoaded', () => {
+                const appContainer = document.querySelector('.container');
+
+                workouts.forEach((workout, workoutIndex) => {
+                    const workoutDiv = document.createElement('div');
+                    workoutDiv.classList.add('mb-6', 'rounded-xl', 'overflow-hidden', 'bg-white', 'shadow-md');
+
+                    // Cabeçalho recolhível do treino
+                    const header = document.createElement('div');
+                    header.classList.add('collapsible-header', 'font-bold', 'text-lg', 'bg-indigo-600', 'text-white', 'hover:bg-indigo-700', 'p-4', 'rounded-t-xl');
+                    header.innerHTML = `<span>${workout.day}</span><span class="text-xl">+</span>`;
+                    workoutDiv.appendChild(header);
+
+                    // Conteúdo dos exercícios (aqui tudo dentro será recolhível)
+                    const content = document.createElement('div');
+                    content.classList.add('collapsible-content', 'p-4');
+                    workoutDiv.appendChild(content);
+
+                    // Barra de progresso do treino (agora dentro do conteúdo recolhível)
+                    const progressBarContainer = document.createElement('div');
+                    progressBarContainer.classList.add('progress-bar-container');
+                    const progressBarFill = document.createElement('div');
+                    progressBarFill.id = `progress-bar-fill-${workoutIndex}`;
+                    progressBarFill.classList.add('progress-bar-fill');
+                    progressBarContainer.appendChild(progressBarFill);
+                    content.appendChild(progressBarContainer); // Adicionado ao 'content'
+
+                    // Adicionar exercícios ao conteúdo
+                    workout.exercises.forEach((exercise, exerciseIndex) => {
+                        const exerciseId = `exercise-${workoutIndex}-${exerciseIndex}`;
+                        const exerciseItemDiv = document.createElement('div');
+                        exerciseItemDiv.id = exerciseId;
+                        exerciseItemDiv.classList.add('exercise-item', 'text-gray-700');
+
+                        exerciseItemDiv.innerHTML = `
+                            <div>
+                                <h3 class="font-semibold text-indigo-700">${exercise.name}</h3>
+                                <p class="text-sm">Grupo: ${exercise.group}</p>
+                                <p class="text-sm" id="series-display-${exerciseId}" data-total-series="${exercise.series}" data-reps="${exercise.reps}">Série: 0/${exercise.series} | Reps: ${exercise.reps}</p>
+                            </div>
+                            <div class="flex flex-col sm:flex-row items-center justify-start sm:justify-end gap-2">
+                                <button id="add-series-btn-${exerciseId}" class="btn btn-primary w-full sm:w-auto">+ 1 Série</button>
+                                <button id="subtract-series-btn-${exerciseId}" class="btn btn-secondary w-full sm:w-auto">Voltar Série</button>
+                            </div>
+                        `;
+                        content.appendChild(exerciseItemDiv);
+                        // Inicializar estado para cada exercício
+                        exerciseStates[exerciseId] = {
+                            currentSeries: 0
+                        };
+                    });
+                    
+                    // Botão de Resetar Treino (agora dentro do conteúdo recolhível)
+                    const resetWorkoutButton = document.createElement('button');
+                    resetWorkoutButton.id = `reset-workout-btn-${workoutIndex}`;
+                    resetWorkoutButton.classList.add('btn', 'reset-workout-btn');
+                    resetWorkoutButton.textContent = "Resetar Treino";
+                    content.appendChild(resetWorkoutButton); // Adicionado ao 'content'
+
+
+                    appContainer.appendChild(workoutDiv);
+
+                    // Adicionar evento de clique ao cabeçalho para recolher/expandir
+                    header.addEventListener('click', () => {
+                        content.classList.toggle('active');
+                        header.querySelector('span:last-child').textContent = content.classList.contains('active') ? '-' : '+';
+                    });
+
+                    // Adicionar listeners para os botões após a renderização
+                    workout.exercises.forEach((exercise, exerciseIndex) => {
+                        const exerciseId = `exercise-${workoutIndex}-${exerciseIndex}`;
+                        const addSeriesBtn = document.getElementById(`add-series-btn-${exerciseId}`);
+                        const subtractSeriesBtn = document.getElementById(`subtract-series-btn-${exerciseId}`);
+                        const seriesDisplay = document.getElementById(`series-display-${exerciseId}`);
+
+                        addSeriesBtn.addEventListener('click', () => {
+                            addOneSeries(addSeriesBtn, seriesDisplay, exerciseId, exercise.series, workoutIndex);
+                        });
+
+                        subtractSeriesBtn.addEventListener('click', () => {
+                            subtractOneSeries(addSeriesBtn, seriesDisplay, exerciseId, exercise.series, workoutIndex);
+                        });
+                    });
+
+                    // Listener para o botão de resetar treino
+                    resetWorkoutButton.addEventListener('click', () => {
+                        resetWorkout(workoutIndex);
+                    });
+
+                    // Atualizar a barra de progresso inicial
+                    updateWorkoutProgressBar(workoutIndex);
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>
